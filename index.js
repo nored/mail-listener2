@@ -11,6 +11,7 @@ var simpleParser = require('mailparser').simpleParser;
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
+var crypto = require('crypto');
 
 class MailListener extends EventEmitter {
   constructor(options) {
@@ -118,10 +119,13 @@ class MailListener extends EventEmitter {
                 {
                   if (self.attachments)
                   {
-                    await fs.writeFile(`${self.attachmentOptions.directory}${att.filename}`, att.content, (error) =>{
+                    let token = crypto.randomBytes(28).toString('hex');
+                    let uploadDirPath = path.join(self.attachmentOptions.directory, token);
+                    fs.mkdirSync(uploadDirPath);
+                    await fs.writeFile(`${uploadDirPath}${att.filename}`, att.content, (error) =>{
                       self.emit('error', error);
                     });
-                    self.emit('attachment', att, `${self.attachmentOptions.directory}${att.filename}`, seqno);
+                    self.emit('attachment', att, `${uploadDirPath}${att.filename}`, seqno);
                   }
                   else
                   {
@@ -144,4 +148,4 @@ class MailListener extends EventEmitter {
     });
   }
 };
-module.exports.MailListener = MailListener;
+module.exports = MailListener;

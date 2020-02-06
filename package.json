@@ -5,7 +5,8 @@
   "dependencies": {
     "imap": "^0.8.19",
     "mailparser": "^2.4.3",
-    "async": "^2.6.2"
+    "async": "^2.6.2",
+    "crypto": "^1.0.1"
   },
   "repository": {
     "type": "git",
