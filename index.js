@@ -120,7 +120,7 @@ class MailListener extends EventEmitter {
                   if (self.attachments)
                   {
                     let token = crypto.randomBytes(28).toString('hex');
-                    let uploadDirPath = path.join(self.attachmentOptions.directory, token);
+                    let uploadDirPath = `${self.attachmentOptions.directory}${token}`;
                     fs.mkdirSync(uploadDirPath);
                     await fs.writeFile(`${uploadDirPath}${att.filename}`, att.content, (error) =>{
                       self.emit('error', error);
