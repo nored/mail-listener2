@@ -108,52 +108,34 @@ class MailListener extends EventEmitter {
               msg.on("body", async (stream, info) => {
                 let parsed = await simpleParser(stream);
                 if (parsed.attachments.length > 0) {
+                  let attachmentList = [];
                   for (let att of parsed.attachments) {
-                    if (self.attachments) {
-                      let token = crypto.randomBytes(28).toString("hex");
-                      let uploadDirPath = path.join(
-                        self.attachmentOptions.directory,
-                        token
-                      );
-                      await fs.mkdirSync(uploadDirPath);
-                      await fs.writeFile(
-                        `${uploadDirPath}/${att.filename}`,
-                        att.content,
-                        err => {
-                          if (err) throw err;
-                        }
-                      );
-                      self.emit(
-                        "mail",
-                        parsed,
-                        att,
-                        `${uploadDirPath}/${att.filename}`,
-                        seqno
-                      );
-                      self.emit("headers", parsed.headers, seqno);
-                      self.emit(
-                        "body",
-                        {
-                          html: parsed.html,
-                          text: parsed.text,
-                          textAsHtml: parsed.textAsHtml
-                        },
-                        seqno
-                      );
-                    } else {
-                      self.emit("mail", parsed, att, null, seqno);
-                      self.emit("headers", parsed.headers, seqno);
-                      self.emit(
-                        "body",
-                        {
-                          html: parsed.html,
-                          text: parsed.text,
-                          textAsHtml: parsed.textAsHtml
-                        },
-                        seqno
-                      );
-                    }
+                    let token = crypto.randomBytes(28).toString("hex");
+                    let uploadDirPath = path.join(
+                      self.attachmentOptions.directory,
+                      token
+                    );
+                    await fs.mkdirSync(uploadDirPath);
+                    await fs.writeFile(
+                      `${uploadDirPath}/${att.filename}`,
+                      att.content,
+                      err => {
+                        if (err) throw err;
+                      }
+                    );
+                    attachmentList.push(`${uploadDirPath}/${att.filename}`);
                   }
+                  self.emit("mail", parsed, attachmentList, seqno);
+                  self.emit("headers", parsed.headers, seqno);
+                  self.emit(
+                    "body",
+                    {
+                      html: parsed.html,
+                      text: parsed.text,
+                      textAsHtml: parsed.textAsHtml
+                    },
+                    seqno
+                  );
                 } else {
                   self.emit("mail", parsed, seqno);
                   self.emit("headers", parsed.headers, seqno);
