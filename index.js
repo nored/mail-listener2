@@ -123,7 +123,7 @@ class MailListener extends EventEmitter {
                         if (err) throw err;
                       }
                     );
-                    attachmentList.push(`${uploadDirPath}/${att.filename}`);
+                    attachmentList.push(`${token}/${att.filename}`);
                   }
                   self.emit("mail", parsed, attachmentList, seqno);
                   self.emit("headers", parsed.headers, seqno);
